@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if form.instance.articulo_id %}Editar{% else %}Nuevo{% endif %} Artículo - Sistema POS{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="h3">
+        <i class="fas fa-{% if form.instance.articulo_id %}edit{% else %}plus{% endif %} me-2"></i>
+        {% if form.instance.articulo_id %}Editar Artículo{% else %}Nuevo Artículo{% endif %}
+    </h2>
+    <a href="{% url 'articulos_list' %}" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-1"></i>Volver</a>
+</div>
+
+<div class="card shadow">
+    <div class="card-header bg-white"><h5 class="mb-0">Información del Artículo</h5></div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            
+            <h5>Datos Generales</h5>
+            {{ form.as_p }}
+
+            <hr class="my-4">
+            
+            <h5>Precios</h5>
+            {{ precio_form.as_p }}
+
+            <div class="d-flex justify-content-end mt-4">
+                <button type="submit" class="btn btn-primary">Guardar Artículo</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const grupoSelect = document.getElementById('id_grupo');
+      const lineaSelect = document.getElementById('id_linea');
+  
+      grupoSelect.addEventListener('change', function () {
+        const grupoId = this.value;
+  
+        if (!grupoId) {
+          lineaSelect.innerHTML = '<option value="">---------</option>';
+          return;
+        }
+  
+        fetch(`/core/ajax/cargar-lineas/?grupo_id=${grupoId}`)
+          .then(response => response.json())
+          .then(data => {
+            // Limpiar opciones actuales
+            lineaSelect.innerHTML = '<option value="">---------</option>';
+  
+            // Agregar nuevas opciones
+            data.forEach(function (linea) {
+              const option = document.createElement('option');
+              option.value = linea.id;
+              option.textContent = linea.nombre;
+              lineaSelect.appendChild(option);
+            });
+          });
+      });
+    });
+  </script>
+  
+{% endblock %}
